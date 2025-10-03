@@ -9,6 +9,8 @@ export default function Gallery() {
   const [photos, setPhotos] = useState<string[]>([]);
   const [isCameraOn, setIsCameraOn] = useState(true);
 
+  
+
   // Charger les photos sauvegardées
   useEffect(() => {
     const savedPhotos = localStorage.getItem("gallery_photos");
@@ -69,7 +71,7 @@ export default function Gallery() {
     >
       <h1 style={{ fontSize: "3rem", marginBottom: "1rem" }}>Gallery</h1>
       <p style={{ fontSize: "1.2rem", maxWidth: "600px", lineHeight: "1.6" }}>
-        Prenez des photos 📸 — elles apparaîtront juste en dessous et resteront sauvegardées localement.
+        Prenez des photos.
       </p>
 
       {/* Caméra */}
