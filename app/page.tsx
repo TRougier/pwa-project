@@ -1,10 +1,10 @@
-"use client"; // <- ça indique que ce composant est un Client Component
+"use client"; // Composant client
 
 import { useEffect } from "react";
 import Link from "next/link";
 
-
 export default function Page() {
+  // Enregistrement du service worker
   useEffect(() => {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
@@ -13,8 +13,6 @@ export default function Page() {
         .catch((err) => console.error("Erreur SW:", err));
     }
   }, []);
-
-  
 
   return (
     <div
@@ -46,45 +44,48 @@ export default function Page() {
         <li style={{ marginBottom: "0.5rem" }}>⚛ React 18</li>
         <li style={{ marginBottom: "0.5rem" }}>TypeScript</li>
         <li style={{ marginBottom: "0.5rem" }}>Service Worker pour PWA</li>
-        <li style={{ marginBottom: "0.5rem" }}>CSS </li>
+        <li style={{ marginBottom: "0.5rem" }}>CSS</li>
       </ul>
 
-      <div style={{ marginTop: "2rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
-  <Link
-    href="/room"
-    style={{
-      color: "#00bfff",
-      textDecoration: "underline",
-      fontSize: "1.2rem",
-    }}
-  >
-    Aller dans la Room
-  </Link>
-  <Link
-    href="/gallery"
-    style={{
-      color: "#00bfff",
-      textDecoration: "underline",
-      fontSize: "1.2rem",
-    }}
-  >
-    Aller dans la Gallery
-  </Link>
-  <Link
-    href="/reception"
-    style={{
-      color: "#00bfff",
-      textDecoration: "underline",
-      fontSize: "1.2rem",
-    }}
-  >
-    Aller dans la Reception
-  </Link>
-</div>
-
-
+      <div
+        style={{
+          marginTop: "2rem",
+          display: "flex",
+          flexDirection: "column",
+          gap: "1rem",
+        }}
+      >
+        <Link
+          href="/room"
+          style={{
+            color: "#00bfff",
+            textDecoration: "underline",
+            fontSize: "1.2rem",
+          }}
+        >
+          Aller dans la Room
+        </Link>
+        <Link
+          href="/gallery"
+          style={{
+            color: "#00bfff",
+            textDecoration: "underline",
+            fontSize: "1.2rem",
+          }}
+        >
+          Aller dans la Gallery
+        </Link>
+        <Link
+          href="/reception"
+          style={{
+            color: "#00bfff",
+            textDecoration: "underline",
+            fontSize: "1.2rem",
+          }}
+        >
+          Aller dans la Reception
+        </Link>
+      </div>
     </div>
   );
 }
-
-  
