@@ -19,20 +19,19 @@ export default function RoomsPage() {
   const router = useRouter();
 
   // Connexion socket
-  useEffect(() => {
-    const s = io(SOCKET_URL, { transports: ["websocket"] });
-    setSocket(s);
+useEffect(() => {
+  const s = io(SOCKET_URL, { transports: ["websocket"] });
+  setSocket(s);
 
-    s.on("chat-msg", (msg: any) =>
-      setMessages((prev) => [...prev, { pseudo: msg.pseudo, text: msg.content }])
-    );
+  s.on("connect", () => console.log("Connecté au serveur socket"));
+  s.on("disconnect", () => console.log("Déconnecté"));
 
-    s.on("chat-rooms-update", (data: Record<string, any>) => {
-      setRooms(data);
-    });
+  // ✅ Retourne une fonction, pas l'objet
+  return () => {
+    s.disconnect();
+  };
+}, []);
 
-    return () => s.disconnect();
-  }, []);
 
   // Chargement initial via API
   useEffect(() => {
