@@ -16,7 +16,7 @@ export default function Page() {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>Mon Projet React</h1>
+      <h1 style={styles.title}>Mon Projet React...</h1>
 
       <p style={styles.description}>
         Bienvenue sur la page d’accueil de mon projet. Ce projet est une
