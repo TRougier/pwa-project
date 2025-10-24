@@ -21,6 +21,6 @@ jobs:
           script: |
             cd /var/mds/pwa-project
             git pull origin main
-            npm install --production
+            npm install        # <-- installation complète (inclut typescript)
             npm run build
-            pm2 reload mds
+            pm2 reload mds || pm2 start npm --name mds -- start
