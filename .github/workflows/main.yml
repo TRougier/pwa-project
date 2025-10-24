@@ -19,7 +19,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /var/mds
+            cd /var/mds/pwa-project
             git pull origin main
             npm install --production
             npm run build
