@@ -20,7 +20,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /var/mds/pwa-project
+            rm -rf .next                    # supprime les anciens builds
             git pull origin main
-            npm install        # <-- installation complète (inclut typescript)
-            npm run build
-            pm2 reload mds || pm2 start npm --name mds -- start
+            npm ci                          # installation propre et complète
+            npm run build                   # génère le dossier .next/
+            pm2 delete mds || true          # supprime l’ancien process s’il existe
+            pm2 start npm --name mds -- start
