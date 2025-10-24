@@ -1,19 +1,15 @@
 
-const BASE_URL = "http://formation.anjousoft.fr/socketio/api";
+const BASE_URL = "http://api.tools.gavago.fr/socketio/api";
 
-export async function getImage(id) {
-  const res = await fetch(`${BASE_URL}/images/${id}`);
-  return await res.json();
-}
-
-export async function postImage(id, imageData) {
-  const res = await fetch(`${BASE_URL}/images/`, {
+export async function createRoom(roomName) {
+  const res = await fetch(`${BASE_URL}/rooms/${roomName}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id, image_data: imageData }),
+    body: JSON.stringify({ roomName }),
   });
   return await res.json();
 }
+
 
 export async function getRooms() {
   const res = await fetch(`${BASE_URL}/rooms`, {
