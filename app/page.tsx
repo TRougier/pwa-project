@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useEffect } from "react";
 import Link from "next/link";
 
@@ -38,7 +39,7 @@ export default function Page() {
           Aller dans la Gallery
         </Link>
         <Link href="/reception" style={styles.link}>
-          Aller dans la Reception
+          Aller dans la Reception.
         </Link>
       </div>
     </div>
