@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { getRooms } from "../src/services/api.js";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+
 
 const SOCKET_URL = "https://api.tools.gavago.fr/socketio";
 
@@ -97,9 +99,23 @@ useEffect(() => {
           </div>
 
           {/* Bouton retour accueil */}
-          <button style={styles.homeBtn} onClick={() => router.push("/")}>
-            Retour à l’accueil
-          </button>
+          <div style={{ marginTop: "2rem" }}>
+        <Link
+          href="/"
+          style={{
+            color: "#00bfff",
+            textDecoration: "none",
+            justifyContent: "center",
+            fontSize: "1.2rem",
+            border: "1px solid #00bfff",
+            padding: "0.5rem 1rem",
+            borderRadius: "5px",
+            transition: "all 0.3s",
+          }}
+        >
+          Retour à l’accueil
+        </Link>
+      </div>
         </div>
       ) : (
         <div style={styles.chatContainer}>
