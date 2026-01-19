@@ -121,7 +121,7 @@ console.log(messages);
     <div style={styles.container}>
       {!currentRoom ? (
         <div>
-          <h2 style={styles.title}>Liste des rooms</h2>
+          <h2 style={styles.title}>Liste des roooooms</h2>
 
           <div style={styles.newRoomContainer}>
             <input
