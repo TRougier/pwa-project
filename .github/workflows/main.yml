@@ -25,4 +25,4 @@ jobs:
             npm ci                          # installation propre et complète
             npm run build                   # génère le dossier .next/
             pm2 delete mds || true          # supprime l’ancien process s’il existe
-            pm2 start npm --name mds -- start -- --port 3000
+            pm2 start npm --name mds -- start
