@@ -7,30 +7,79 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 
-const SOCKET_URL = "https://api.tools.gavago.fr/socketio";
+//const SOCKET_URL = "https://api.tools.gavago.fr/socketio";
+const SOCKET_URL = "https://api.tools.gavago.fr";
+
+interface ChatMessage {
+  content: string;
+  dateEmis: string;
+  roomName: string;
+  userId: string;
+  categorie: "MESSAGE" | "INFO" | "NEW_IMAGE";
+  serverId: string;
+}
 
 export default function RoomsPage() {
   const [socket, setSocket] = useState<any>(null);
   const [rooms, setRooms] = useState<Record<string, any>>({});
   const [currentRoom, setCurrentRoom] = useState<string | null>(null);
-  const [messages, setMessages] = useState<{ pseudo: string; text: string }[]>([]);
+  const [messages, setMessages] = useState<(ChatMessage & { pseudo?: string })[]>([]);
   const [input, setInput] = useState("");
   const [pseudo, setPseudo] = useState<string | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [newRoom, setNewRoom] = useState("");
+  const [connected, setConnected] = useState(false);
+  const [status, setStatus] = useState("Déconnecté");
   const router = useRouter();
 
   // Connexion socket
-useEffect(() => {
-  const s = io(SOCKET_URL, { transports: ["websocket"] });
-  setSocket(s);
+  const connectSocket = () => {
+    console.log("Connexion à :", SOCKET_URL);
+    const s = io(SOCKET_URL, {
+      path: "/socket.io",
+      transports: ["websocket"],
+      withCredentials: false,
+    });
 
-  s.on("connect", () => console.log("Connecté au serveur socket"));
-  s.on("disconnect", () => console.log("Déconnecté"));
+    if (socket) s.disconnect();
+    setSocket(s);
+    setStatus("Connexion en cours...");
+
+    s.on("connect", () => {
+      console.log("✅ Connecté ! ID :", s.id);
+      setConnected(true);
+      setStatus("✅ Connecté");
+    });
+
+    // 🔹 Écoute des messages du serveur
+    s.on("chat-msg", (msg: ChatMessage & { pseudo?: string }) => {
+      setMessages((prev) => [...prev, msg]);
+    });
+
+    // 🔹 Quand on rejoint une room
+    s.on("chat-joined-room", (data: { roomName: string }) => {
+      console.log("🎉 Rejoint la room :", data.roomName);
+      setCurrentRoom((prev) => prev ?? data.roomName);
+    });
+
+    s.on("disconnect", () => {
+      console.log("🔌 Déconnecté du serveur");
+      setConnected(false);
+      setStatus("Déconnecté");
+    });
+
+    // 🔹 Écoute des erreurs
+    s.on("error", (msg: string) => {
+      alert(`Erreur du serveur: ${msg}`);
+    });
+  };
+
+useEffect(() => {
+  connectSocket();
 
   // ✅ Retourne une fonction, pas l'objet
   return () => {
-    s.disconnect();
+    socket?.disconnect();
   };
 }, []);
 
@@ -67,7 +116,7 @@ useEffect(() => {
     socket.emit("chat-msg", { content: input, roomName: currentRoom, pseudo });
     setInput("");
   };
-
+console.log(messages);
   return (
     <div style={styles.container}>
       {!currentRoom ? (
@@ -130,7 +179,7 @@ useEffect(() => {
             ) : (
               messages.map((m, i) => (
                 <div key={i} style={styles.message}>
-                  <b>{m.pseudo}</b>: {m.text}
+                  <b>{m.pseudo || m.userId || "Anonyme"}</b>: {m.content}
                 </div>
               ))
             )}
