@@ -1,5 +1,5 @@
 
-const BASE_URL = "http://api.tools.gavago.fr/socketio/api";
+const BASE_URL = "https://api.tools.gavago.fr/socketio/api";
 
 export async function createRoom(roomName) {
   const res = await fetch(`${BASE_URL}/rooms/${roomName}`, {
@@ -12,9 +12,18 @@ export async function createRoom(roomName) {
 
 
 export async function getRooms() {
-  const res = await fetch(`${BASE_URL}/rooms`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  });
-  return await res.json();
+  try {
+    const res = await fetch(`${BASE_URL}/rooms`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) {
+      console.error("Erreur API:", res.status, res.statusText);
+      return { success: false, data: null };
+    }
+    return await res.json();
+  } catch (error) {
+    console.error("Erreur lors du chargement des rooms:", error);
+    return { success: false, data: null };
+  }
 }

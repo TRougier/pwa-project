@@ -87,7 +87,15 @@ useEffect(() => {
   // Chargement initial via API
   useEffect(() => {
     getRooms().then((res) => {
-      if (res.success && res.data) setRooms(res.data);
+      console.log("Réponse getRooms:", res);
+      if (res.success && res.data) {
+        console.log("Rooms chargées:", res.data);
+        setRooms(res.data);
+      } else {
+        console.warn("Pas de rooms reçues");
+      }
+    }).catch((error) => {
+      console.error("Erreur getRooms:", error);
     });
 
     const storedPseudo = localStorage.getItem("pseudo");
