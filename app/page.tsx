@@ -1,27 +1,18 @@
-// app/page.tsx (ou ton fichier Page)
-// ✅ App réécrite : géolocalisation déplacée dans un composant, la page ne garde que le layout + imports.
-
-"use client";
-
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import BatteryStatus from "./components/battery/BatteryStatus";
 import GeoLocationBox from "./components/geo/GeoLocationBox";
+import VibrationButton from "./components/VibrationButton";
+import PwaRegister from "./components/pwa/PwaRegister";
+
+export const dynamic = "force-dynamic";
 
 export default function Page() {
-  useEffect(() => {
-    // PWA Service Worker
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/sw.js")
-        .then((reg) => console.log("SW enregistré", reg))
-        .catch((err) => console.error("Erreur SW:", err));
-    }
-  }, []);
-
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>Mon Projet Reacttttttt</h1>
+      <PwaRegister />
+
+      <h1 style={styles.title}>Mon Projet React</h1>
 
       <p style={styles.description}>
         Bienvenue sur la page d’accueil de mon projet. Ce projet est une application web construite avec React et
@@ -48,12 +39,12 @@ export default function Page() {
         </Link>
       </div>
 
-      {/* ✅ BATTERY STATUS */}
+      
+
       <div style={{ maxWidth: 700, margin: "3rem auto 0 auto" }}>
         <BatteryStatus />
       </div>
 
-      {/* ✅ GEOLOCALISATION (déplacée) */}
       <GeoLocationBox />
     </div>
   );
@@ -68,33 +59,16 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "40px 20px",
     textAlign: "center",
   },
-  title: {
-    fontSize: "2.5rem",
-    marginBottom: "1rem",
-  },
+  title: { fontSize: "2.5rem", marginBottom: "1rem" },
   description: {
     fontSize: "1.1rem",
     maxWidth: "600px",
     margin: "0 auto 2rem auto",
     lineHeight: "1.5",
   },
-  subtitle: {
-    fontSize: "1.5rem",
-    marginTop: "2rem",
-    marginBottom: "1rem",
-  },
-  list: {
-    listStyle: "none",
-    padding: 0,
-    margin: "0 auto 2rem auto",
-    fontSize: "1.1rem",
-  },
-  links: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "10px",
-  },
+  subtitle: { fontSize: "1.5rem", marginTop: "2rem", marginBottom: "1rem" },
+  list: { listStyle: "none", padding: 0, margin: "0 auto 2rem auto", fontSize: "1.1rem" },
+  links: { display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" },
   link: {
     border: "1px solid #007bff",
     borderRadius: "5px",

@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { getRooms } from "../src/services/api.js";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
 
 //const SOCKET_URL = "https://api.tools.gavago.fr/socketio";
 const SOCKET_URL = "https://api.tools.gavago.fr";
@@ -35,6 +34,7 @@ export default function RoomsPage() {
   // Connexion socket
   const connectSocket = () => {
     console.log("Connexion à :", SOCKET_URL);
+
     const s = io(SOCKET_URL, {
       path: "/socket.io",
       transports: ["websocket"],
@@ -74,15 +74,14 @@ export default function RoomsPage() {
     });
   };
 
-useEffect(() => {
-  connectSocket();
+  useEffect(() => {
+    connectSocket();
 
-  // ✅ Retourne une fonction, pas l'objet
-  return () => {
-    socket?.disconnect();
-  };
-}, []);
-
+    return () => {
+      socket?.disconnect();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Chargement initial via API
   useEffect(() => {
@@ -116,12 +115,12 @@ useEffect(() => {
     socket.emit("chat-msg", { content: input, roomName: currentRoom, pseudo });
     setInput("");
   };
-console.log(messages);
+
   return (
     <div style={styles.container}>
       {!currentRoom ? (
         <div>
-          <h2 style={styles.title}>Liste des roooooms</h2>
+          <h2 style={styles.title}>Liste des rooms</h2>
 
           <div style={styles.newRoomContainer}>
             <input
@@ -147,24 +146,27 @@ console.log(messages);
             )}
           </div>
 
-          {/* Bouton retour accueil */}
           <div style={{ marginTop: "2rem" }}>
-        <Link
-          href="/"
-          style={{
-            color: "#00bfff",
-            textDecoration: "none",
-            justifyContent: "center",
-            fontSize: "1.2rem",
-            border: "1px solid #00bfff",
-            padding: "0.5rem 1rem",
-            borderRadius: "5px",
-            transition: "all 0.3s",
-          }}
-        >
-          Retour à l’accueil
-        </Link>
-      </div>
+            <Link
+              href="/"
+              style={{
+                color: "#00bfff",
+                textDecoration: "none",
+                justifyContent: "center",
+                fontSize: "1.2rem",
+                border: "1px solid #00bfff",
+                padding: "0.5rem 1rem",
+                borderRadius: "5px",
+                transition: "all 0.3s",
+              }}
+            >
+              Retour à l’accueil
+            </Link>
+          </div>
+
+          <div style={{ marginTop: 10, fontSize: 12, color: "#666" }}>
+            Statut: {status} {connected ? "(socket OK)" : ""}
+          </div>
         </div>
       ) : (
         <div style={styles.chatContainer}>
@@ -174,14 +176,17 @@ console.log(messages);
           <h3 style={styles.roomTitle}>Room : {currentRoom}</h3>
 
           <div style={styles.messageBox}>
-            {messages.length === 0 ? (
+            {/* ✅ Affiche uniquement les messages categorie === "MESSAGE" */}
+            {messages.filter((m) => m.categorie === "MESSAGE").length === 0 ? (
               <p>Aucun message...</p>
             ) : (
-              messages.map((m, i) => (
-                <div key={i} style={styles.message}>
-                  <b>{m.pseudo || m.userId || "Anonyme"}</b>: {m.content}
-                </div>
-              ))
+              messages
+                .filter((m) => m.categorie === "MESSAGE")
+                .map((m, i) => (
+                  <div key={i} style={styles.message}>
+                    <b>{m.pseudo || m.userId || "Anonyme"}</b>: {m.content}
+                  </div>
+                ))
             )}
           </div>
 
@@ -198,7 +203,6 @@ console.log(messages);
             </button>
           </div>
 
-          {/* Bouton retour accueil */}
           <button style={styles.homeBtn} onClick={() => router.push("/")}>
             Retour à l’accueil
           </button>
