@@ -6,6 +6,7 @@ import { getRooms } from "../src/services/api.js";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { addNotification } from "../utils/notifications";
+import { emitJoinRoom, emitCreateRoom, emitSendMessage } from "../utils/roomSocketLogic";
 
 //const SOCKET_URL = "https://api.tools.gavago.fr/socketio";
 const SOCKET_URL = "https://api.tools.gavago.fr";
@@ -103,19 +104,22 @@ export default function RoomsPage() {
     }
     setCurrentRoom(roomName);
     setMessages([]); // on garde ton comportement : tu clear quand tu changes de room
-    socketRef.current?.emit("chat-join-room", { roomName, pseudo });
+    // socketRef.current?.emit("chat-join-room", { roomName, pseudo });
+    emitJoinRoom(socketRef.current, roomName, pseudo);
   };
 
   const createRoom = () => {
     if (!newRoom.trim() || !socketRef.current) return;
     const roomName = newRoom.trim();
-    socketRef.current.emit("chat-create-room", { roomName, pseudo });
+    // socketRef.current.emit("chat-create-room", { roomName, pseudo });
+    emitCreateRoom(socketRef.current, roomName, pseudo || "Anonyme"); // Fallback pseudo check handled inside but here safer
     setNewRoom("");
   };
 
   const sendMessage = () => {
     if (!input.trim() || !socketRef.current || !currentRoom) return;
-    socketRef.current.emit("chat-msg", { content: input, roomName: currentRoom, pseudo });
+    // socketRef.current.emit("chat-msg", { content: input, roomName: currentRoom, pseudo });
+    emitSendMessage(socketRef.current, input, currentRoom, pseudo || "Anonyme");
     setInput("");
   };
 
