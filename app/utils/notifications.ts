@@ -7,8 +7,7 @@ export type SimpleNotification = {
 const KEY = "notifications_simple";
 
 function uid() {
-  // fallback si randomUUID pas dispo
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   const c: any = crypto;
   return c?.randomUUID ? c.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }

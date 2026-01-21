@@ -54,7 +54,7 @@ describe("Room Socket Logic", () => {
         });
 
         it("should fail if content is empty", () => {
-            // @ts-ignore - testing runtime behavior for empty string if typed as string
+
             const result = emitSendMessage(mockSocket, "", "General", "Toto");
             expect(result).toBe(false);
             expect(mockSocket.emit).not.toHaveBeenCalled();

@@ -7,13 +7,13 @@ type Props = {
   pattern?: number | number[];
 };
 
-export default function VibrationButton({ label = "📳 Vibrer", pattern = 200 }: Props) {
+export default function VibrationButton({ label = "Vibrer", pattern = 200 }: Props) {
   const [supported] = useState(() => "vibrate" in navigator);
 
   const vibrate = () => {
     if (!("vibrate" in navigator)) return;
 
-    // pattern peut être: 200 ou [100, 50, 100]
+
     navigator.vibrate(pattern);
   };
 

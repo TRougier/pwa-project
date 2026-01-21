@@ -1,12 +1,8 @@
 import { Socket } from "socket.io-client";
 
-/**
- * Logique métier pour les sockets (Rooms & Messages)
- */
 
-/**
- * Rejoint une room existante via socket.
- */
+
+
 export function emitJoinRoom(socket: Socket | any, roomName: string, pseudo: string | null): boolean {
     if (!socket || !roomName || !pseudo) {
         console.warn("emitJoinRoom: Arguments invalides", { socket: !!socket, roomName, pseudo });
@@ -16,9 +12,7 @@ export function emitJoinRoom(socket: Socket | any, roomName: string, pseudo: str
     return true;
 }
 
-/**
- * Crée une nouvelle room via socket.
- */
+
 export function emitCreateRoom(socket: Socket | any, roomName: string, pseudo: string | null): boolean {
     if (!socket || !roomName || !pseudo) {
         console.warn("emitCreateRoom: Arguments invalides", { socket: !!socket, roomName, pseudo });
@@ -28,9 +22,7 @@ export function emitCreateRoom(socket: Socket | any, roomName: string, pseudo: s
     return true;
 }
 
-/**
- * Envoie un message dans une room via socket.
- */
+
 export function emitSendMessage(socket: Socket | any, content: string, roomName: string, pseudo: string | null): boolean {
     if (!socket || !content || !roomName || !pseudo) {
         console.warn("emitSendMessage: Arguments invalides", { socket: !!socket, content, roomName, pseudo });

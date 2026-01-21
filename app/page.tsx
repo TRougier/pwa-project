@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import BatteryStatus from "./components/battery/BatteryStatus";
 import GeoLocationBox from "./components/geo/GeoLocationBox";
-import VibrationButton from "./components/VibrationButton";
+import VibrationButton from "./components/vibration/VibrationButton";
 import PwaRegister from "./components/pwa/PwaRegister";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +21,7 @@ export default function Page() {
 
       <h2 style={styles.subtitle}>Technologies utilisées :</h2>
       <ul style={styles.list}>
-        <li>⚛ React 18</li>
+        <li>React 18</li>
         <li>TypeScript</li>
         <li>Service Worker pour PWA</li>
         <li>CSS</li>
@@ -42,7 +42,7 @@ export default function Page() {
         </Link>
       </div>
 
-      
+
 
       <div style={{ maxWidth: 700, margin: "3rem auto 0 auto" }}>
         <BatteryStatus />

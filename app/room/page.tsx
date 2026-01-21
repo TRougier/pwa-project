@@ -8,7 +8,7 @@ import Link from "next/link";
 import { addNotification } from "../utils/notifications";
 import { emitJoinRoom, emitCreateRoom, emitSendMessage } from "../utils/roomSocketLogic";
 
-//const SOCKET_URL = "https://api.tools.gavago.fr/socketio";
+
 const SOCKET_URL = "https://api.tools.gavago.fr";
 
 interface ChatMessage {
@@ -40,7 +40,7 @@ export default function RoomsPage() {
     pseudoRef.current = pseudo;
   }, [pseudo]);
 
-  // Chargement initial via API + pseudo
+
   useEffect(() => {
     getRooms().then((res) => {
       if (res.success && res.data) setRooms(res.data);
@@ -50,7 +50,7 @@ export default function RoomsPage() {
     if (storedPseudo) setPseudo(storedPseudo);
   }, []);
 
-  // Connexion socket (1 seule fois)
+
   useEffect(() => {
     const s = io(SOCKET_URL, {
       path: "/socket.io",
@@ -66,19 +66,19 @@ export default function RoomsPage() {
       setStatus("Connecté");
     });
 
-    // 🔹 Message reçu
+
     s.on("chat-msg", (msg: ChatMessage & { pseudo?: string }) => {
-      // garder l'historique dans le chat (même si on n'est pas dans la room)
+
       setMessages((prev) => [...prev, msg]);
 
-      // Notifications : uniquement les nouveaux messages
+
       if (msg.categorie === "MESSAGE" && msg.pseudo !== pseudoRef.current) {
         const author = msg.pseudo || msg.userId || "Anonyme";
         addNotification(`[${msg.roomName}] ${author}: ${msg.content}`);
       }
     });
 
-    // 🔹 Rejoint room
+
     s.on("chat-joined-room", (data: { roomName: string }) => {
       setCurrentRoom((prev) => prev ?? data.roomName);
     });
@@ -103,22 +103,22 @@ export default function RoomsPage() {
       return;
     }
     setCurrentRoom(roomName);
-    setMessages([]); // on garde ton comportement : tu clear quand tu changes de room
-    // socketRef.current?.emit("chat-join-room", { roomName, pseudo });
+    setMessages([]);
+
     emitJoinRoom(socketRef.current, roomName, pseudo);
   };
 
   const createRoom = () => {
     if (!newRoom.trim() || !socketRef.current) return;
     const roomName = newRoom.trim();
-    // socketRef.current.emit("chat-create-room", { roomName, pseudo });
-    emitCreateRoom(socketRef.current, roomName, pseudo || "Anonyme"); // Fallback pseudo check handled inside but here safer
+
+    emitCreateRoom(socketRef.current, roomName, pseudo || "Anonyme");
     setNewRoom("");
   };
 
   const sendMessage = () => {
     if (!input.trim() || !socketRef.current || !currentRoom) return;
-    // socketRef.current.emit("chat-msg", { content: input, roomName: currentRoom, pseudo });
+
     emitSendMessage(socketRef.current, input, currentRoom, pseudo || "Anonyme");
     setInput("");
   };
@@ -196,7 +196,7 @@ export default function RoomsPage() {
           <h3 style={styles.roomTitle}>Room : {currentRoom}</h3>
 
           <div style={styles.messageBox}>
-            {/* Affiche uniquement les messages categorie === "MESSAGE" */}
+
             {messages.filter((m) => m.categorie === "MESSAGE").length === 0 ? (
               <p>Aucun message...</p>
             ) : (

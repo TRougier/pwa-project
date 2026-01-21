@@ -4,10 +4,10 @@ import React, { useEffect, useMemo, useState } from "react";
 
 type BatteryState = {
   supported: boolean;
-  level?: number; // 0..1
+  level?: number;
   charging?: boolean;
-  chargingTime?: number; // seconds
-  dischargingTime?: number; // seconds
+  chargingTime?: number;
+  dischargingTime?: number;
   error?: string;
 };
 
@@ -121,7 +121,7 @@ export default function BatteryStatus() {
 
   return (
     <div style={styles.batteryBox}>
-      <h3 style={styles.batteryTitle}>🔋 Batterie</h3>
+      <h3 style={styles.batteryTitle}>Batterie</h3>
 
       {!battery.supported ? (
         <p style={styles.batteryText}>

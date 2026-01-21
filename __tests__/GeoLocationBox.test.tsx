@@ -47,7 +47,7 @@ describe("GeoLocationBox", () => {
     it("displays error message on failure", async () => {
         mockGeolocation.getCurrentPosition.mockImplementation((_, error) =>
             error({
-                code: 1, // PERMISSION_DENIED
+                code: 1,
                 PERMISSION_DENIED: 1,
             })
         );

@@ -1,5 +1,4 @@
-// components/geo/GeoLocationBox.tsx
-// ✅ Composant autonome : state + handlers + urls + UI + styles
+
 
 "use client";
 
@@ -65,7 +64,7 @@ export default function GeoLocationBox() {
 
   return (
     <div style={styles.geoBox}>
-      <h2 style={styles.subtitle}>📍 Ma position</h2>
+      <h2 style={styles.subtitle}>Ma position</h2>
 
       <button onClick={getLocation} style={styles.geoBtn} disabled={geo.status === "loading"}>
         {geo.status === "loading" ? "Localisation..." : "Afficher ma position"}
@@ -93,7 +92,7 @@ export default function GeoLocationBox() {
         </>
       )}
 
-      {geo.status === "error" && <p style={styles.geoError}>❌ {geo.error}</p>}
+      {geo.status === "error" && <p style={styles.geoError}> {geo.error}</p>}
     </div>
   );
 }

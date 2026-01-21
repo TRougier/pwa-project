@@ -15,7 +15,7 @@ describe("VibrationButton", () => {
     });
 
     it("triggers navigator.vibrate when clicked", () => {
-        // Mock navigator.vibrate
+
         const mockVibrate = jest.fn();
         Object.defineProperty(window.navigator, "vibrate", {
             value: mockVibrate,
