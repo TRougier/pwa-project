@@ -136,9 +136,9 @@ export default function RoomsPage() {
               placeholder="Nom de la nouvelle room"
               style={styles.input}
             />
-            <button onClick={createRoom} style={styles.createBtn}>
+            {/* <button onClick={createRoom} style={styles.createBtn}>
               Créer
-            </button>
+            </button> */}
           </div>
 
           <div style={styles.roomGrid}>

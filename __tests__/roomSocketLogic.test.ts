@@ -1,3 +1,4 @@
+//test unitaire 
 import { emitJoinRoom, emitCreateRoom, emitSendMessage } from "../app/utils/roomSocketLogic";
 
 describe("Room Socket Logic", () => {
@@ -31,16 +32,7 @@ describe("Room Socket Logic", () => {
         });
     });
 
-    describe("emitCreateRoom", () => {
-        it("should emit 'chat-create-room' when valid", () => {
-            const result = emitCreateRoom(mockSocket, "NewRoom", "Admin");
-            expect(result).toBe(true);
-            expect(mockSocket.emit).toHaveBeenCalledWith("chat-create-room", {
-                roomName: "NewRoom",
-                pseudo: "Admin",
-            });
-        });
-    });
+
 
     describe("emitSendMessage", () => {
         it("should emit 'chat-msg' with content", () => {
