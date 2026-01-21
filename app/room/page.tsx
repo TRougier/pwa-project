@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { getRooms } from "../src/services/api.js";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { addNotification } from "../utils/notifications";
 
 //const SOCKET_URL = "https://api.tools.gavago.fr/socketio";
 const SOCKET_URL = "https://api.tools.gavago.fr";
@@ -19,7 +20,6 @@ interface ChatMessage {
 }
 
 export default function RoomsPage() {
-  const [socket, setSocket] = useState<any>(null);
   const [rooms, setRooms] = useState<Record<string, any>>({});
   const [currentRoom, setCurrentRoom] = useState<string | null>(null);
   const [messages, setMessages] = useState<(ChatMessage & { pseudo?: string })[]>([]);
@@ -29,61 +29,17 @@ export default function RoomsPage() {
   const [newRoom, setNewRoom] = useState("");
   const [connected, setConnected] = useState(false);
   const [status, setStatus] = useState("Déconnecté");
+
   const router = useRouter();
 
-  // Connexion socket
-  const connectSocket = () => {
-    console.log("Connexion à :", SOCKET_URL);
-
-    const s = io(SOCKET_URL, {
-      path: "/socket.io",
-      transports: ["websocket"],
-      withCredentials: false,
-    });
-
-    if (socket) s.disconnect();
-    setSocket(s);
-    setStatus("Connexion en cours...");
-
-    s.on("connect", () => {
-      console.log("✅ Connecté ! ID :", s.id);
-      setConnected(true);
-      setStatus("✅ Connecté");
-    });
-
-    // 🔹 Écoute des messages du serveur
-    s.on("chat-msg", (msg: ChatMessage & { pseudo?: string }) => {
-      setMessages((prev) => [...prev, msg]);
-    });
-
-    // 🔹 Quand on rejoint une room
-    s.on("chat-joined-room", (data: { roomName: string }) => {
-      console.log("🎉 Rejoint la room :", data.roomName);
-      setCurrentRoom((prev) => prev ?? data.roomName);
-    });
-
-    s.on("disconnect", () => {
-      console.log("🔌 Déconnecté du serveur");
-      setConnected(false);
-      setStatus("Déconnecté");
-    });
-
-    // 🔹 Écoute des erreurs
-    s.on("error", (msg: string) => {
-      alert(`Erreur du serveur: ${msg}`);
-    });
-  };
+  const socketRef = useRef<any>(null);
+  const pseudoRef = useRef<string | null>(null);
 
   useEffect(() => {
-    connectSocket();
+    pseudoRef.current = pseudo;
+  }, [pseudo]);
 
-    return () => {
-      socket?.disconnect();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Chargement initial via API
+  // Chargement initial via API + pseudo
   useEffect(() => {
     getRooms().then((res) => {
       if (res.success && res.data) setRooms(res.data);
@@ -93,26 +49,73 @@ export default function RoomsPage() {
     if (storedPseudo) setPseudo(storedPseudo);
   }, []);
 
+  // Connexion socket (1 seule fois)
+  useEffect(() => {
+    const s = io(SOCKET_URL, {
+      path: "/socket.io",
+      transports: ["websocket"],
+      withCredentials: false,
+    });
+
+    socketRef.current = s;
+    setStatus("Connexion en cours...");
+
+    s.on("connect", () => {
+      setConnected(true);
+      setStatus("Connecté");
+    });
+
+    // 🔹 Message reçu
+    s.on("chat-msg", (msg: ChatMessage & { pseudo?: string }) => {
+      // garder l'historique dans le chat (même si on n'est pas dans la room)
+      setMessages((prev) => [...prev, msg]);
+
+      // Notifications : uniquement les nouveaux messages
+      if (msg.categorie === "MESSAGE" && msg.pseudo !== pseudoRef.current) {
+        const author = msg.pseudo || msg.userId || "Anonyme";
+        addNotification(`[${msg.roomName}] ${author}: ${msg.content}`);
+      }
+    });
+
+    // 🔹 Rejoint room
+    s.on("chat-joined-room", (data: { roomName: string }) => {
+      setCurrentRoom((prev) => prev ?? data.roomName);
+    });
+
+    s.on("disconnect", () => {
+      setConnected(false);
+      setStatus("Déconnecté");
+    });
+
+    s.on("error", (msg: string) => {
+      alert(`Erreur du serveur: ${msg}`);
+    });
+
+    return () => {
+      s.disconnect();
+    };
+  }, []);
+
   const joinRoom = (roomName: string) => {
     if (!pseudo) {
       setShowPopup(true);
       return;
     }
     setCurrentRoom(roomName);
-    setMessages([]);
-    socket?.emit("chat-join-room", { roomName, pseudo });
+    setMessages([]); // on garde ton comportement : tu clear quand tu changes de room
+    socketRef.current?.emit("chat-join-room", { roomName, pseudo });
   };
 
   const createRoom = () => {
-    if (!newRoom.trim() || !socket) return;
+    if (!newRoom.trim() || !socketRef.current) return;
     const roomName = newRoom.trim();
-    socket.emit("chat-create-room", { roomName, pseudo });
+    socketRef.current.emit("chat-create-room", { roomName, pseudo });
     setNewRoom("");
   };
 
   const sendMessage = () => {
-    if (!input.trim() || !socket || !currentRoom) return;
-    socket.emit("chat-msg", { content: input, roomName: currentRoom, pseudo });
+    if (!input.trim() || !socketRef.current || !currentRoom) return;
+    socketRef.current.emit("chat-msg", { content: input, roomName: currentRoom, pseudo });
     setInput("");
   };
 
@@ -146,21 +149,34 @@ export default function RoomsPage() {
             )}
           </div>
 
-          <div style={{ marginTop: "2rem" }}>
+          <div style={{ marginTop: "2rem", display: "flex", gap: 10, justifyContent: "center" }}>
             <Link
               href="/"
               style={{
                 color: "#00bfff",
                 textDecoration: "none",
-                justifyContent: "center",
                 fontSize: "1.2rem",
                 border: "1px solid #00bfff",
                 padding: "0.5rem 1rem",
                 borderRadius: "5px",
-                transition: "all 0.3s",
               }}
             >
               Retour à l’accueil
+            </Link>
+
+            <Link
+              href="/notifications"
+              style={{
+                color: "#007bff",
+                textDecoration: "none",
+                fontSize: "1.2rem",
+                border: "1px solid #007bff",
+                padding: "0.5rem 1rem",
+                borderRadius: "5px",
+                background: "#fff",
+              }}
+            >
+              Notifications
             </Link>
           </div>
 
@@ -176,7 +192,7 @@ export default function RoomsPage() {
           <h3 style={styles.roomTitle}>Room : {currentRoom}</h3>
 
           <div style={styles.messageBox}>
-            {/* ✅ Affiche uniquement les messages categorie === "MESSAGE" */}
+            {/* Affiche uniquement les messages categorie === "MESSAGE" */}
             {messages.filter((m) => m.categorie === "MESSAGE").length === 0 ? (
               <p>Aucun message...</p>
             ) : (
@@ -242,11 +258,7 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: "5px",
     cursor: "pointer",
   },
-  roomGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
-    gap: "15px",
-  },
+  roomGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: "15px" },
   roomCard: {
     border: "1px solid #ccc",
     borderRadius: "8px",
@@ -300,13 +312,7 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     justifyContent: "center",
   },
-  popup: {
-    backgroundColor: "#fff",
-    padding: "25px",
-    borderRadius: "8px",
-    textAlign: "center",
-    width: "300px",
-  },
+  popup: { backgroundColor: "#fff", padding: "25px", borderRadius: "8px", textAlign: "center", width: "300px" },
   popupBtns: { display: "flex", justifyContent: "space-between", marginTop: "15px" },
   popupBtn: {
     backgroundColor: "#007bff",
@@ -316,11 +322,5 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: "5px",
     cursor: "pointer",
   },
-  popupCancel: {
-    backgroundColor: "#ccc",
-    border: "none",
-    padding: "8px 12px",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
+  popupCancel: { backgroundColor: "#ccc", border: "none", padding: "8px 12px", borderRadius: "5px", cursor: "pointer" },
 };

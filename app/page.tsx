@@ -37,6 +37,9 @@ export default function Page() {
         <Link href="/reception" style={styles.link}>
           Aller dans la Reception
         </Link>
+        <Link href="/notifications" style={styles.link}>
+          Aller vers Notifications
+        </Link>
       </div>
 
       
