@@ -95,4 +95,47 @@ Voici le processus étape par étape quand vous tapez `npm test` :
     - **Si c'est pareil** : Il affiche un ✅ vert.
     - **Si c'est différent** : Il arrête tout, affiche un ❌ rouge, et vous dit : *"J'attendais 'true' mais j'ai reçu 'false'"*.
 
-C'est comme un correcteur automatique de copie : il lit la consigne (le test), regarde votre réponse (le code), et met une note (Pass/Fail).
+
+## 6. Et pour les Composants (Vibration, GPS, Batterie) ?
+
+Nous avons créé 3 fichiers de tests supplémentaires dans `__tests__/`.
+Mais attendez... **Node.js n'a pas de GPS, ni de vibreur, ni de batterie !** Comment peut-on tester ça ?
+
+C'est là qu'intervient la magie du **Mocking (Simulation)**.
+
+### Le principe du "Faux Navigateur"
+Nous utilisons `jsdom` (installé via `jest-environment-jsdom`). C'est un navigateur invisible, entièrement écrit en JavaScript. Il sait ce qu'est une `div`, un `button`, ou le `window.navigator`.
+
+Cependant, il ne simule pas le matériel. C'est nous qui devons le faire dans le test.
+
+### Exemple : Le Test GPS (`GeoLocationBox.test.tsx`)
+
+1.  **On pirate le navigateur** :
+    ```typescript
+    Object.defineProperty(global.navigator, "geolocation", {
+      value: { getCurrentPosition: jest.fn() }
+    });
+    ```
+    On dit à Jest : *"Hé, quand le code demande le GPS, ne cherche pas de satellite. Utilise cette fausse fonction à la place."*
+
+2.  **On injecte un scénario** :
+    ```typescript
+    // Scénario : Tout se passe bien, on est à Paris
+    mockGeolocation.getCurrentPosition.mockImplementation((successCallback) => {
+      successCallback({ coords: { latitude: 48.8566, longitude: 2.3522 } });
+    });
+    ```
+    On force la fausse fonction à répondre immédiatement : *"Tiens, voici tes coordonnées (Paris)."*
+
+3.  **On vérifie l'affichage** :
+    Le composant React reçoit ces fausses coordonnées, croit qu'elles sont vraies, et affiche le lien Google Maps.
+    ```typescript
+    expect(screen.getByText("Ouvrir Google Maps")).toBeInTheDocument();
+    ```
+
+### Résumé
+Nous n'avons pas modifié vos composants (`.tsx`). Ils ne savent même pas qu'ils sont testés.
+Nous avons juste créé des fichiers `.test.tsx` qui :
+1.  Créent un faux environnement (faux GPS, fausse batterie).
+2.  Dessinent le composant dedans (`render`).
+3.  Vérifient s'il réagit comme prévu (`expect`).
